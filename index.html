@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>Conferences</title>
+    <script type="text/javascript" src="data.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <style>
+      .hidden-onload {
+        display: none;
+      }
+      .conferences-list {
+        table-layout: fixed;
+        overflow-wrap: anywhere;
+      }
+      @media only screen and (max-width: 40em) {
+        .conferences-list {
+          font-size: xx-small;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2>国際会議</h2>
+    <div id="conferences-list-international"></div>
+    <h2>国内会議</h2>
+    <div id="conferences-list-domestic"></div>
+  </body>
+</html>
