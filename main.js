@@ -1,0 +1,177 @@
+const conferences_list_columns_key = Object.keys(conferences_list_columns);
+const conferences_list_columns_value = Object.values(conferences_list_columns);
+
+let conferences_list_international = [];
+let conferences_list_domestic = [];
+
+let timestamp_today = new Date();
+timestamp_today.setHours(0, 0, 0, 0);
+
+let timestamp_display_oldest = new Date();
+timestamp_display_oldest.setFullYear(timestamp_display_oldest.getFullYear() - 1);
+timestamp_display_oldest.setHours(0, 0, 0, 0);
+
+function conferences_list_update_timestamp(list, key, reset=false) {
+  for (let a = 0; a < list.length; a++) {
+    let record_timestamp;
+    if (reset) {
+      record_timestamp = timestamp_today;
+    } else {
+      record_timestamp = list[a]['timestamp'];
+    }
+    if (typeof(list[a][key]) !== 'undefined') {
+      if (typeof(list[a][key]['date']) !== 'undefined') {
+        const record_date = list[a][key]['date'];
+        let timestamp_year = (typeof(record_date['year']) === 'undefined' || record_date['year'] == 0)? timestamp_today.getFullYear() : record_date['year'];
+        let timestamp_month = (typeof(record_date['month']) === 'undefined' || record_date['month'] == 0)? timestamp_today.getMonth() : record_date['month'] - 1;
+        let timestamp_day = (typeof(record_date['day']) === 'undefined' || record_date['day'] == 0)? timestamp_today.getDay() : record_date['day'];
+        let timestamp = new Date(timestamp_year, timestamp_month, timestamp_day);
+        if (record_timestamp == timestamp_today) {
+          record_timestamp = timestamp;
+        } else if (timestamp < record_timestamp) {
+          record_timestamp = timestamp;
+        }
+      }
+    }
+    list[a]['timestamp'] = record_timestamp;
+  }
+}
+
+function conferences_list_sort(list, sort) {
+  if (sort == "deadline") {
+    conferences_list_update_timestamp(list, 'apply', true);
+    conferences_list_update_timestamp(list, 'abstract');
+    conferences_list_update_timestamp(list, 'paper');
+  } else {
+    conferences_list_update_timestamp(list, sort, true);
+  }
+  let list_sorted = [];
+  for (let a = 0; a < list.length; a++) {
+    if (list[a]['timestamp'] < timestamp_display_oldest) {
+      continue;
+    } else if (list[a]['timestamp'] < timestamp_today) {
+      list[a]['closed'] = "";
+    }
+    let b = 0;
+    while (b < list_sorted.length) {
+      if (list[a]['timestamp'] < list_sorted[b]['timestamp']) {
+        break;
+      }
+      b++;
+    }
+    list_sorted.splice(b, 0, list[a]);
+  }
+  return list_sorted;
+}
+
+function conferences_list_display(dom, list, sort) {
+  dom.innerHTML = "";
+  const list_sorted = conferences_list_sort(list, sort);
+  const table = document.createElement("table");
+  table.className = "conferences-list";
+  const tbody = document.createElement("tbody");
+  const tr = document.createElement("tr");
+  for (let a = 0; a < conferences_list_columns_key.length; a++) {
+    let is_sort_target = false;
+    if (sort == "deadline") {
+      if (conferences_list_columns_key[a] == "apply") {
+        is_sort_target = true;
+      } else if (conferences_list_columns_key[a] == "abstract") {
+        is_sort_target = true;
+      } else if (conferences_list_columns_key[a] == "paper") {
+        is_sort_target = true;
+      }
+    } else if (conferences_list_columns_key[a] == sort) {
+      is_sort_target = true;
+    }
+    const td = document.createElement("td");
+    td.innerHTML = conferences_list_columns_value[a];
+    if (is_sort_target) {
+      td.innerHTML += ` ∨`;
+      td.style.color = "blue";
+    }
+    if (conferences_list_columns_key[a] == "name" || conferences_list_columns_key[a] == "venue") {
+      td.addEventListener("click", (e)=>conferences_list_display_all(sort="deadline"));
+    } else {
+      td.addEventListener("click", (e)=>conferences_list_display_all(sort=conferences_list_columns_key[a]));
+    }
+    td.style.cursor = "pointer";
+    tr.appendChild(td);
+  }
+  tbody.appendChild(tr);
+  for (let a = 0; a < list_sorted.length; a++) {
+    const tr = document.createElement("tr");
+    if (typeof(list_sorted[a]['closed']) !== 'undefined') {
+      tr.style.opacity = 0.7;
+      tr.style.backgroundColor = "rgba(0.5 0.5 1.0 / 0.3)";
+    }
+    for (let b = 0; b < conferences_list_columns_key.length; b++) {
+      const td = document.createElement("td");
+      if (typeof(list_sorted[a][conferences_list_columns_key[b]]) !== 'undefined') {
+        const record = list_sorted[a][conferences_list_columns_key[b]];
+        const record_keys = Object.keys(record);
+        for (let c = 0; c < record_keys.length; c++) {
+          if (record_keys[c] == 'date') {
+            const record_date = record['date'];
+            if (typeof(record_date['year']) !== 'undefined') {
+              td.innerHTML += (record_date['year'] > 0)? `${record_date['year']}` : "";
+            }
+            if (typeof(record_date['month']) !== 'undefined') {
+              td.innerHTML += (record_date['month'] > 0)? `/${record_date['month']}` : "";
+            }
+            if (typeof(record_date['day']) !== 'undefined') {
+              td.innerHTML += (record_date['day'] > 0)? `/${record_date['day']}` : "";
+            }
+          } else if (record_keys[c] == 'text') {
+            td.innerHTML += `${record['text']}`;
+          } else if (record_keys[c] == 'url') {
+            td.style.cursor = "pointer";
+            td.style.color = "blue";
+            td.addEventListener("click", function () {window.open(record['url'])});
+          }
+        }
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  dom.appendChild(table);
+}
+
+function conferences_list_display_all(sort="deadline") {
+  let is_valid_key = false;
+  for (let a = 0; a < conferences_list_columns_key.length; a++) {
+    if (conferences_list_columns_key[a] == sort) {
+      is_valid_key = true;
+    }
+  }
+  if (!is_valid_key) {
+    sort = "deadline";
+  }
+  const conferences_list_international_dom = document.querySelector("#conferences-list-international");
+  if (!conferences_list_international_dom) {
+    return true;
+  }
+  conferences_list_display(conferences_list_international_dom, conferences_list_international, sort);
+  const conferences_list_domestic_dom = document.querySelector("#conferences-list-domestic");
+  if (!conferences_list_domestic_dom) {
+    return true;
+  }
+  conferences_list_display(conferences_list_domestic_dom, conferences_list_domestic, sort);
+}
+
+window.addEventListener("load", function () {
+  if (typeof(conferences_list) === 'undefined') {
+    return true;
+  }
+  for (let a = 0; a < conferences_list.length; a++) {
+    if (conferences_list[a]['type'] == "international") {
+      conferences_list_international.push(conferences_list[a]);
+    } else {
+      conferences_list_domestic.push(conferences_list[a]);
+    }
+  }
+  conferences_list_display_all();
+  return false;
+});
