@@ -73,6 +73,7 @@ function conferences_list_update_timestamp(list, key, reset=false) {
         let timestamp_month = (typeof(record_date['month']) === 'undefined' || record_date['month'] == 0)? timestamp_today.getMonth() : record_date['month'] - 1;
         let timestamp_day = (typeof(record_date['day']) === 'undefined' || record_date['day'] == 0)? timestamp_today.getDay() : record_date['day'];
         let timestamp = new Date(timestamp_year, timestamp_month, timestamp_day);
+        timestamp.setHours(0, 0, 0, 0);
         if (record_timestamp == timestamp_today) {
           record_timestamp = timestamp;
         } else if (timestamp < record_timestamp) {
