@@ -26,7 +26,7 @@ function conferences_list_load_from_table(dom) {
   let list = [];
   for (let a = 1; a < rows.length; a++) {
     let data = {};
-    for (let b = 1; b < rows[a].length; b++) {
+    for (let b = 0; b < columns.length; b++) {
       if (columns[b][0] == 'url') {
         data['name'][columns[b][0]] = rows[a][b];
       } else if (columns[b][1] == 'text') {
@@ -45,7 +45,6 @@ function conferences_list_load_from_table(dom) {
     }
     list.push(data);
   }
-  console.log(list);
   return list;
 }
 
