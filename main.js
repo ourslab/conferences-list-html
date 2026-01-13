@@ -233,13 +233,13 @@ function conferences_list_display_all(sort="deadline") {
 }
 
 window.addEventListener("load", function () {
-  let list;
+  let list = [];
   if (typeof(conferences_list) !== 'undefined') {
-    list = conferences_list;
+    list = list.concat(conferences_list);
   }
   let conferences_list_figure_dom = document.querySelector("figure#conferences-list");
   if (conferences_list_figure_dom) {
-    list += conferences_list_load_from_table(conferences_list_figure_dom);
+    list = list.concat(conferences_list_load_from_table(conferences_list_figure_dom));
   }
   for (let a = 0; a < list.length; a++) {
     if (list[a]['type'] == "international") {
