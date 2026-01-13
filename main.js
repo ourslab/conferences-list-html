@@ -39,7 +39,7 @@ function conferences_list_load_from_table(dom) {
         data[columns[b][0]][columns[b][1]] = rows[a].children[b].innerHTML;
       } else if (columns[b][1] == 'date') {
         let date = rows[a].children[b].innerHTML.split("/");
-        date[0] = (date.length > 0)? parseInt(date[0]) : 0;
+        date[0] = (date[0])? parseInt(date[0]) : 0;
         date[1] = (date.length > 1)? parseInt(date[1]) : 0;
         date[2] = (date.length > 2)? parseInt(date[2]) : 0;
         if (typeof(data[columns[b][0]]) === 'undefined') {
