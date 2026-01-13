@@ -23,7 +23,7 @@ function conferences_list_load_from_table(dom) {
       columns[a].push("");
     }
   }
-  let list = []
+  let list = [];
   for (let a = 1; a < rows.length; a++) {
     let data = {};
     for (let b = 1; b < rows[a].length; b++) {
@@ -45,6 +45,7 @@ function conferences_list_load_from_table(dom) {
     }
     list.push(data);
   }
+  console.log(list);
   return list;
 }
 
