@@ -28,17 +28,27 @@ function conferences_list_load_from_table(dom) {
     let data = {};
     for (let b = 0; b < columns.length; b++) {
       if (columns[b][0] == 'url') {
-        data['name'][columns[b][0]] = rows[a].children[b].innerHTML;
+        if (typeof(data['name']) === 'undefined') {
+          data['name'] = {};
+        }
+        data['name']['url'] = rows[a].children[b].innerHTML;
       } else if (columns[b][1] == 'text') {
+        if (typeof(data[columns[b][0]]) === 'undefined') {
+          data[columns[b][0]] = {};
+        }
         data[columns[b][0]][columns[b][1]] = rows[a].children[b].innerHTML;
       } else if (columns[b][1] == 'date') {
         let date = rows[a].children[b].innerHTML.split("/");
         date[0] = (date.length > 0)? parseInt(date[0]) : 0;
         date[1] = (date.length > 1)? parseInt(date[1]) : 0;
         date[2] = (date.length > 2)? parseInt(date[2]) : 0;
-        data['date']['year'] = date[0];
-        data['date']['month'] = date[1];
-        data['date']['day'] = date[2];
+        if (typeof(data[columns[b][0]]) === 'undefined') {
+          data[columns[b][0]] = {};
+        }
+        data[columns[b][0]] = {};
+        data[columns[b][0]]['year'] = date[0];
+        data[columns[b][0]]['month'] = date[1];
+        data[columns[b][0]]['day'] = date[2];
       } else {
         data[columns[b][0]] = rows[a].children[b].innerHTML;
       }
