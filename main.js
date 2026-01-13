@@ -38,17 +38,15 @@ function conferences_list_load_from_table(dom) {
         }
         data[columns[b][0]][columns[b][1]] = rows[a].children[b].innerHTML;
       } else if (columns[b][1] == 'date') {
-        let date = rows[a].children[b].innerHTML.split("/");
-        date[0] = (date[0])? parseInt(date[0]) : 0;
-        date[1] = (date.length > 1)? parseInt(date[1]) : 0;
-        date[2] = (date.length > 2)? parseInt(date[2]) : 0;
+        let date = {};
+        let date_split = rows[a].children[b].innerHTML.split("/");
+        date['year'] = (date_split[0])? parseInt(date_split[0]) : 0;
+        date['month'] = (date_split.length > 1)? parseInt(date_split[1]) : 0;
+        date['day'] = (date_split.length > 2)? parseInt(date_split[2]) : 0;
         if (typeof(data[columns[b][0]]) === 'undefined') {
           data[columns[b][0]] = {};
         }
-        data[columns[b][0]] = {};
-        data[columns[b][0]]['year'] = date[0];
-        data[columns[b][0]]['month'] = date[1];
-        data[columns[b][0]]['day'] = date[2];
+        data[columns[b][0]][columns[b][1]] = date;
       } else {
         data[columns[b][0]] = rows[a].children[b].innerHTML;
       }
