@@ -16,9 +16,9 @@ function conferences_list_load_from_table(dom) {
   if (rows.length < 2) {
     return [];
   }
-  let columns = rows[0].children;
-  for (let a = 0; a < columns.length; a++) {
-    columns[a] = columns[a].innerHTML.split(" ");
+  let columns = [];
+  for (let a = 0; a < rows[0].children.length; a++) {
+    columns.push(rows[0].children[a].innerHTML.split(" "));
     if (columns[a].length == 1) {
       columns[a].push("");
     }
@@ -28,11 +28,11 @@ function conferences_list_load_from_table(dom) {
     let data = {};
     for (let b = 0; b < columns.length; b++) {
       if (columns[b][0] == 'url') {
-        data['name'][columns[b][0]] = rows[a].children[b];
+        data['name'][columns[b][0]] = rows[a].children[b].innerHTML;
       } else if (columns[b][1] == 'text') {
-        data[columns[b][0]][columns[b][1]] = rows[a].children[b];
+        data[columns[b][0]][columns[b][1]] = rows[a].children[b].innerHTML;
       } else if (columns[b][1] == 'date') {
-        let date = rows[a].children[b].split("/");
+        let date = rows[a].children[b].innerHTML.split("/");
         date[0] = (date.length > 0)? parseInt(date[0]) : 0;
         date[1] = (date.length > 1)? parseInt(date[1]) : 0;
         date[2] = (date.length > 2)? parseInt(date[2]) : 0;
@@ -40,7 +40,7 @@ function conferences_list_load_from_table(dom) {
         data['date']['month'] = date[1];
         data['date']['day'] = date[2];
       } else {
-        data[columns[b][0]] = rows[a].children[b];
+        data[columns[b][0]] = rows[a].children[b].innerHTML;
       }
     }
     list.push(data);
