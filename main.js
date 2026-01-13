@@ -11,6 +11,43 @@ let timestamp_display_oldest = new Date();
 timestamp_display_oldest.setFullYear(timestamp_display_oldest.getFullYear() - 1);
 timestamp_display_oldest.setHours(0, 0, 0, 0);
 
+function conferences_list_load_from_table(dom) {
+  const rows = dom.children;
+  if (rows.length < 2) {
+    return [];
+  }
+  let columns = rows[0];
+  for (let a = 0; a < columns.length; a++) {
+    columns[a] = columns[a].split(" ");
+    if (columns[a].length == 1) {
+      columns[a].push("");
+    }
+  }
+  let list = []
+  for (let a = 1; a < rows.length; a++) {
+    let data = {};
+    for (let b = 1; b < rows[a].length; b++) {
+      if (columns[b][0] == 'url') {
+        data['name'][columns[b][0]] = rows[a][b];
+      } else if (columns[b][1] == 'text') {
+        data[columns[b][0]][columns[b][1]] = rows[a][b];
+      } else if (columns[b][1] == 'date') {
+        let date = rows[a][b].split("/");
+        date[0] = (date.length > 0)? parseInt(date[0]) : 0;
+        date[1] = (date.length > 1)? parseInt(date[1]) : 0;
+        date[2] = (date.length > 2)? parseInt(date[2]) : 0;
+        data['date']['year'] = date[0];
+        data['date']['month'] = date[1];
+        data['date']['day'] = date[2];
+      } else {
+        data[columns[b][0]] = rows[a][b];
+      }
+    }
+    list.push(data);
+  }
+  return list;
+}
+
 function conferences_list_update_timestamp(list, key, reset=false) {
   for (let a = 0; a < list.length; a++) {
     let record_timestamp;
@@ -45,12 +82,23 @@ function conferences_list_sort(list, sort) {
   } else {
     conferences_list_update_timestamp(list, sort, true);
   }
+  let tags_displayed = {};
+  let tags_not_displayed = {};
   let list_sorted = [];
   for (let a = 0; a < list.length; a++) {
+    let tag = (typeof(list[a]['tag']) !== 'undefined')? list[a]['tag'] : false;
     if (list[a]['timestamp'] < timestamp_display_oldest) {
+      if (tag) {
+        tags_not_displayed[tag] = true;
+      }
       continue;
-    } else if (list[a]['timestamp'] < timestamp_today) {
-      list[a]['closed'] = "";
+    } else {
+      if (list[a]['timestamp'] < timestamp_today) {
+        list[a]['closed'] = "";
+      }
+      if (tag) {
+        tags_displayed[tag] = true;
+      }
     }
     let b = 0;
     while (b < list_sorted.length) {
@@ -60,6 +108,19 @@ function conferences_list_sort(list, sort) {
       b++;
     }
     list_sorted.splice(b, 0, list[a]);
+  }
+  tags_displayed = Object.keys(tags_displayed);
+  tags_not_displayed = Object.keys(tags_not_displayed);
+  for (let a = 0; a < tags_not_displayed.length; a++) {
+    let tag_exist = false;
+    for (let b = 0; b < tags_displayed.length; b++) {
+      if (tags_not_displayed[a] == tags_displayed[b]) {
+        tag_exist = true;
+      }
+    }
+    if (!tag_exist) {
+      console.warn(`Tag: ${tags_not_displayed[a]} missed!`);
+    }
   }
   return list_sorted;
 }
@@ -162,14 +223,19 @@ function conferences_list_display_all(sort="deadline") {
 }
 
 window.addEventListener("load", function () {
-  if (typeof(conferences_list) === 'undefined') {
-    return true;
+  let list;
+  if (typeof(conferences_list) !== 'undefined') {
+    list = conferences_list;
   }
-  for (let a = 0; a < conferences_list.length; a++) {
-    if (conferences_list[a]['type'] == "international") {
-      conferences_list_international.push(conferences_list[a]);
+  let conferences_list_table_dom = document.querySelector("table#conferences-list");
+  if (conferences_list_table_dom) {
+    list += conferences_list_load_from_table(conferences_list_table_dom);
+  }
+  for (let a = 0; a < list.length; a++) {
+    if (list[a]['type'] == "international") {
+      conferences_list_international.push(list[a]);
     } else {
-      conferences_list_domestic.push(conferences_list[a]);
+      conferences_list_domestic.push(list[a]);
     }
   }
   conferences_list_display_all();
