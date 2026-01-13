@@ -12,7 +12,7 @@ timestamp_display_oldest.setFullYear(timestamp_display_oldest.getFullYear() - 1)
 timestamp_display_oldest.setHours(0, 0, 0, 0);
 
 function conferences_list_load_from_table(dom) {
-  const rows = dom.children;
+  const rows = dom.children[0].children[0].children;
   if (rows.length < 2) {
     return [];
   }
@@ -227,9 +227,9 @@ window.addEventListener("load", function () {
   if (typeof(conferences_list) !== 'undefined') {
     list = conferences_list;
   }
-  let conferences_list_table_dom = document.querySelector("table#conferences-list");
-  if (conferences_list_table_dom) {
-    list += conferences_list_load_from_table(conferences_list_table_dom);
+  let conferences_list_figure_dom = document.querySelector("figure#conferences-list");
+  if (conferences_list_figure_dom) {
+    list += conferences_list_load_from_table(conferences_list_figure_dom);
   }
   for (let a = 0; a < list.length; a++) {
     if (list[a]['type'] == "international") {
