@@ -82,7 +82,7 @@ function conferences_list_update_timestamp(list, key, reset=false) {
     timestamp.setHours(0, 0, 0, 0);
     if (!(list[a]['timestamp'] < timestamp_today || list[a]['timestamp'] > timestamp_today)) {
       list[a]['timestamp'] = timestamp;
-    } else if (timestamp < record_timestamp) {
+    } else if (timestamp < list[a]['timestamp']) {
       list[a]['timestamp'] = timestamp;
     }
   }
