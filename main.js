@@ -58,35 +58,33 @@ function conferences_list_load_from_table(dom) {
 
 function conferences_list_update_timestamp(list, key, reset=false) {
   for (let a = 0; a < list.length; a++) {
-    let record_timestamp;
     if (reset) {
-      record_timestamp = timestamp_today;
-    } else {
-      record_timestamp = list[a]['timestamp'];
+      list[a]['timestamp'] = timestamp_today;
     }
-    if (typeof(list[a][key]) !== 'undefined') {
-      if (typeof(list[a][key]['date']) !== 'undefined') {
-        const record_date = list[a][key]['date'];
-        const timestamp_year_valid = !(typeof(record_date['year']) === 'undefined' || record_date['year'] == 0);
-        const timestamp_year = (timestamp_year_valid)? record_date['year'] : timestamp_today.getFullYear();
-        const timestamp_month_vaild = !(typeof(record_date['month']) === 'undefined' || record_date['month'] == 0);
-        const timestamp_month = (timestamp_month_vaild)? record_date['month'] - 1 : timestamp_today.getMonth();
-        const timestamp_day_vaild = !(typeof(record_date['day']) === 'undefined' || record_date['day'] == 0);
-        const timestamp_day = (timestamp_day_vaild)? record_date['day'] : timestamp_today.getDate();
-        const timestamp_valid = (!timestamp_year_valid)? false : (!timestamp_month_vaild)? false : true;
-        if (!timestamp_valid) {
-          continue;
-        }
-        const timestamp = new Date(timestamp_year, timestamp_month, timestamp_day);
-        timestamp.setHours(0, 0, 0, 0);
-        if (!(record_timestamp < timestamp_today || record_timestamp > timestamp_today)) {
-          record_timestamp = timestamp;
-        } else if (timestamp < record_timestamp) {
-          record_timestamp = timestamp;
-        }
-      }
+    if (typeof(list[a][key]) === 'undefined') {
+      continue;
     }
-    list[a]['timestamp'] = record_timestamp;
+    if (typeof(list[a][key]['date']) === 'undefined') {
+      continue;
+    }
+    const record_date = list[a][key]['date'];
+    const timestamp_year_valid = !(typeof(record_date['year']) === 'undefined' || record_date['year'] == 0);
+    const timestamp_month_vaild = !(typeof(record_date['month']) === 'undefined' || record_date['month'] == 0);
+    const timestamp_day_vaild = !(typeof(record_date['day']) === 'undefined' || record_date['day'] == 0);
+    const timestamp_valid = (!timestamp_year_valid)? false : (!timestamp_month_vaild)? false : true;
+    if (!timestamp_valid) {
+      continue;
+    }
+    const timestamp_year = (timestamp_year_valid)? record_date['year'] : timestamp_today.getFullYear();
+    const timestamp_month = (timestamp_month_vaild)? record_date['month'] - 1 : timestamp_today.getMonth();
+    const timestamp_day = (timestamp_day_vaild)? record_date['day'] : timestamp_today.getDate();
+    const timestamp = new Date(timestamp_year, timestamp_month, timestamp_day);
+    timestamp.setHours(0, 0, 0, 0);
+    if (!(list[a]['timestamp'] < timestamp_today || list[a]['timestamp'] > timestamp_today)) {
+      list[a]['timestamp'] = timestamp;
+    } else if (timestamp < record_timestamp) {
+      list[a]['timestamp'] = timestamp;
+    }
   }
 }
 
