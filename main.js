@@ -189,13 +189,13 @@ function conferences_list_display(dom, list, sort) {
           if (record_keys[c] == 'date') {
             const record_date = record['date'];
             if (typeof(record_date['year']) !== 'undefined') {
-              td.innerHTML += (record_date['year'] > 0)? `${record_date['year']}` : "";
+              td.innerHTML += (record_date['year'] > 0)? `${String(record_date['year']).padStart(4, "0")}` : "";
             }
             if (typeof(record_date['month']) !== 'undefined') {
-              td.innerHTML += (record_date['month'] > 0)? `/${record_date['month']}` : "";
+              td.innerHTML += (record_date['month'] > 0)? `/${String(record_date['month']).padStart(2, "0")}` : "";
             }
             if (typeof(record_date['day']) !== 'undefined') {
-              td.innerHTML += (record_date['day'] > 0)? `/${record_date['day']}` : "";
+              td.innerHTML += (record_date['day'] > 0)? `/${String(record_date['day']).padStart(2, "0")}` : "";
             }
           } else if (record_keys[c] == 'text') {
             td.innerHTML += `${record['text']}`;
