@@ -1,3 +1,14 @@
+window.addEventListener("load", ()=>{
+  const test = document.querySelectorAll("custom-scripts");
+  if (!test) return;
+  const test_array = [].slice.call(test);
+  for (A = 0; A < test_array.length; A++){
+    eval(
+      test_array [A].innerHTML
+    );
+  } 
+})
+
 const conferences_list_columns = {
   name    : "学会名",
   apply   : "申込期限",
@@ -7,7 +18,6 @@ const conferences_list_columns = {
   venue   : "場所"
 };
 let conferences_list = [];
-
 
 const conferences_list_columns_key = Object.keys(conferences_list_columns);
 const conferences_list_columns_value = Object.values(conferences_list_columns);
