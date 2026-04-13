@@ -1,5 +1,5 @@
 window.addEventListener("load", ()=>{
-  const test = document.querySelectorAll("custom-scripts");
+  const test = document.querySelectorAll(".custom-scripts");
   if (!test) return;
   const test_array = [].slice.call(test);
   for (A = 0; A < test_array.length; A++){
