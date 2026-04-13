@@ -5,7 +5,7 @@ window.addEventListener("load", ()=>{
   for (A = 0; A < test_array.length; A++){
     text = `${test_array[A].innerHTML}`;
     eval(
-      text.replace('"',"\"").replace(""","\"")
+      text.replace('“',"\"").replace("”","\"")
     );
   } 
 })
