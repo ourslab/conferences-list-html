@@ -1,3 +1,14 @@
+const conferences_list_columns = {
+  name    : "学会名",
+  apply   : "申込期限",
+  abstract: "Abstract Deadline",
+  paper   : "Paper Deadline",
+  date    : "開会日時",
+  venue   : "場所"
+};
+let conferences_list = [];
+
+
 const conferences_list_columns_key = Object.keys(conferences_list_columns);
 const conferences_list_columns_value = Object.values(conferences_list_columns);
 
