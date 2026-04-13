@@ -3,8 +3,9 @@ window.addEventListener("load", ()=>{
   if (!test) return;
   const test_array = [].slice.call(test);
   for (A = 0; A < test_array.length; A++){
+    text = `${test_array[A].innerHTML}`;
     eval(
-      test_array [A].innerHTML
+      text.replace('"',"\"").replace(""","\"")
     );
   } 
 })
