@@ -4,6 +4,11 @@
   display: none;
 }
 
+
+.custom-scripts {
+  display: none;
+}
+
 .conferences-list {
   table-layout: fixed;
   overflow-wrap: anywhere;
