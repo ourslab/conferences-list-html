@@ -1,14 +1,13 @@
-window.addEventListener("load", ()=>{
+window.addEventListener("load", () => {
   const test = document.querySelectorAll(".custom-scripts");
-  if (!test) return;
-  const test_array = [].slice.call(test);
-  for (A = 0; A < test_array.length; A++){
-    text = `${test_array[A].innerHTML}`;
-    eval(
-      text.replaceAll('“',"\"").replaceAll("”","\"")
-    );
-  } 
-})
+  if (test.length === 0) return;
+  for (let i = 0; i < test.length; i++) {
+    const text = test[i].innerHTML.replaceAll('“', '"').replaceAll('”', '"');
+    const script = document.createElement("script");
+    script.textContent = text;
+    document.body.appendChild(script);
+  }
+});
 
 const conferences_list_columns = {
   name    : "学会名",
@@ -76,6 +75,97 @@ function conferences_list_load_from_table(dom) {
     list.push(data);
   }
   return list;
+}
+
+async function conferences_list_load_from_db() {
+  const url = 'https://confs.ourslab.jp/api/conferences/export';
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(`HTTP Error occurred!: ${response.status}`);
+      return [];
+    }
+    const data = await response.json();
+    const targetArray = Array.isArray(data) ? data : (data.items || []);
+    let list = [];
+    
+    const parseDateText = (str) => {
+      if (!str) return null;
+      const parts = str.split("-");
+      return parts.length === 3 ? {
+        year: parseInt(parts[0], 10),
+        month: parseInt(parts[1], 10),
+        day: parseInt(parts[2], 10)
+      } : {
+        year: 0,
+        month: 0,
+        day: 0
+      };
+    };
+    for (const item of targetArray) {
+      let data = {};
+      data['name'] = {};
+      if (Object.hasOwn(item, 'name')) {
+        data['name']['text'] = item['name'];
+      }
+      if (Object.hasOwn(item, 'website')) {
+        data['name']['url'] = item['website'];
+      }
+      if (Object.hasOwn(item, 'type')) {
+        data['type'] = item['type'];
+      }
+      if (Object.hasOwn(item, 'applicationDeadline')) {
+        let deadline = (item['applicationDeadline'] != null)? item['applicationDeadline'].split("-") : [];
+        if (deadline.length == 3) {
+          data['apply'] = {};
+          data['apply']['date'] = {};
+          data['apply']['date']['year'] = parseInt(deadline[0]);
+          data['apply']['date']['month'] = parseInt(deadline[1]);
+          data['apply']['date']['day'] = parseInt(deadline[2]);
+        }
+      }
+      if (Object.hasOwn(item, 'abstractDeadline')) {
+        let deadline = (item['abstractDeadline'] != null)? item['abstractDeadline'].split("-") : [];
+        if (deadline.length == 3) {
+          data['abstract'] = {};
+          data['abstract']['date'] = {};
+          data['abstract']['date']['year'] = parseInt(deadline[0]);
+          data['abstract']['date']['month'] = parseInt(deadline[1]);
+          data['abstract']['date']['day'] = parseInt(deadline[2]);
+        }
+      }
+      if (Object.hasOwn(item, 'manuscriptDeadline')) {
+        let deadline = (item['manuscriptDeadline'] != null)? item['manuscriptDeadline'].split("-") : [];
+        if (deadline.length == 3) {
+          data['paper'] = {};
+          data['paper']['date'] = {};
+          data['paper']['date']['year'] = parseInt(deadline[0]);
+          data['paper']['date']['month'] = parseInt(deadline[1]);
+          data['paper']['date']['day'] = parseInt(deadline[2]);
+        }
+      }
+      if (Object.hasOwn(item, 'startDate')) {
+        let startDate = (item['startDate'] != null)? item['startDate'].split("-") : [];
+        if (startDate.length == 3) {
+          data['date'] = {};
+          data['date']['date'] = {};
+          data['date']['date']['year'] = parseInt(startDate[0]);
+          data['date']['date']['month'] = parseInt(startDate[1]);
+          data['date']['date']['day'] = parseInt(startDate[2]);
+        }
+      }
+      if (Object.hasOwn(item, 'location')) {
+        data['venue'] = {};
+        data['venue']['text'] = item['location'];
+      }
+      list.push(data);
+    }
+    return list;
+  } catch (error) {
+    console.error('An error occurred while processing data:', error);
+    return [];
+  }
+  return [];
 }
 
 function conferences_list_update_timestamp(list, key, reset=false) {
@@ -258,15 +348,16 @@ function conferences_list_display_all(sort="deadline") {
   conferences_list_display(conferences_list_domestic_dom, conferences_list_domestic, sort);
 }
 
-window.addEventListener("load", function () {
+window.addEventListener("load", async function () {
   let list = [];
-  if (typeof(conferences_list) !== 'undefined') {
-    list = list.concat(conferences_list);
-  }
-  let conferences_list_figure_dom = document.querySelector("figure#conferences-list");
-  if (conferences_list_figure_dom) {
-    list = list.concat(conferences_list_load_from_table(conferences_list_figure_dom));
-  }
+  //if (typeof(conferences_list) !== 'undefined') {
+  //  list = list.concat(conferences_list);
+  //}
+  //let conferences_list_figure_dom = document.querySelector("figure#conferences-list");
+  //if (conferences_list_figure_dom) {
+  //  list = list.concat(conferences_list_load_from_table(conferences_list_figure_dom));
+  //}
+  list = list.concat(await conferences_list_load_from_db());
   for (let a = 0; a < list.length; a++) {
     if (list[a]['type'] == "international") {
       conferences_list_international.push(list[a]);
